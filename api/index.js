@@ -11,7 +11,7 @@ const cookieParser=require('cookie-parser');
 const Post=require('./models/Post');
 const multer=require('multer');
 const uploadMiddleware=multer({dest:'uploads/'});
-
+app.use('/uploads',express.static(__dirname+'/uploads'));
 app.use(cookieParser());
 
 mongoose.connect(
@@ -99,6 +99,10 @@ app.get('/post',async(req,res)=>{
 );
 });
 
-
+app.get('/post/:id',async(req,res)=>{
+  const {id}=req.params;
+  const postDoc=await Post.findById(id).populate("author",['username'])
+  res.json(postDoc);
+})
 
 app.listen(4000);
