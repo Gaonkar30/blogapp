@@ -15,7 +15,7 @@ app.use('/uploads',express.static(__dirname+'/uploads'));
 app.use(cookieParser());
 
 mongoose.connect(
-  "mongodb+srv://trial:SlUOD1VhZP168TLm@cluster0.cnrl93b.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+  "mongourl"
 );
 app.use(cors({credentials:true,origin:'http://localhost:3000'}));
 
@@ -104,5 +104,30 @@ app.get('/post/:id',async(req,res)=>{
   const postDoc=await Post.findById(id).populate("author",['username'])
   res.json(postDoc);
 })
+app.put('/post',uploadMiddleware.single('file'),async(req,res)=>{
+  res.json({fileIs:req.file});
+  let newPath=null;
+  if(req.file){
+    const { originalname, path } = req.file;
+    const parts = originalname.split('.');
+    const ext = parts[parts.length - 1];
+    newPath = path + '.' + ext;
+    fs.rename(path, newPath);
 
+  }
+  const {token}=req.cookies;
+  jwt.verify(token,secret,{},async(err,info)=>{
+    if(err) throw err;
+    const {id,title,summary,content}=req.body;
+    const PostDoc=await Post.findById(id);
+    const isAuthor=JSON.stringify(PostDoc.author)===JSON.stringify(info.id);
+    if(!isAuthor){
+      return res.status(400).json("You are not the author");
+    }
+    await PostDoc.update({title,summary,content,cover:newPath?newPath:PostDoc.cover,});
+    res.json(PostDoc);
+
+
+  })
+})
 app.listen(4000);

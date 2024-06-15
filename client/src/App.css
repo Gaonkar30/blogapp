@@ -1,6 +1,9 @@
 * {
   box-sizing: border-box;
 }
+a{
+  cursor: pointer;
+}
 body {
   color: #222;
 }
@@ -54,6 +57,9 @@ div.post p.info {
   font-weight: bold;
   display: flex;
   gap: 10px;
+}
+button{
+  cursor: pointer;
 }
 div.post p.info a.author {
   color: #333;

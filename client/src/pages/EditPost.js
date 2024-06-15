@@ -57,6 +57,7 @@ export default function EditPost() {
     formData.append("title", title);
     formData.append("summary", summary);
     formData.append("content", content);
+    formData.set("id",id);
     if (file) {
       formData.append("file", file);
     }
@@ -64,6 +65,7 @@ export default function EditPost() {
     const response = await fetch(`http://localhost:4000/post/${id}`, {
       method: "PUT",
       body: formData,
+      credentials:'include',
     });
     
     if (response.ok) {
@@ -72,7 +74,7 @@ export default function EditPost() {
   }
 
   if (redirect) {
-    return <Navigate to="/" />;
+    return <Navigate to={"/post/"+id} />;
   }
 
   return (
